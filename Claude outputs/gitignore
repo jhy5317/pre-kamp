@@ -1,0 +1,30 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints/
+.ipynb_checkpoints
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Data (용량이 크거나 원본 데이터는 버전관리 제외 - 필요 시 조정)
+data/raw_data/
+data/preprocessed/
+*.csv
+
+# 모델 학습 산출물
+lightning_logs/
+outputs/*.png
+outputs/*.html
+!outputs/.gitkeep
+
+# 학습 체크포인트 (재개용, 용량이 크고 재생성 가능하므로 버전관리 제외)
+outputs/checkpoints/
+*.ckpt
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

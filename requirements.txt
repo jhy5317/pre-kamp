@@ -1,0 +1,69 @@
+# ===========================================================
+# KAMP_LJP - 전자부품(배터리팩) 예지보전 AI 데이터셋 연습 프로젝트
+#
+# 실행 환경: Python 3.11 (3.11.9에서 아래 전체 조합 설치·import·GPU 연산까지 검증, 2026-09-10)
+#   - 시스템 Python이 3.14인 경우 그대로는 빌드 실패가 나므로 3.11 인터프리터를 별도 설치했음
+#     (winget install Python.Python.3.11)
+#
+# 가상환경 생성 (Python 3.11 + 내장 venv 기준)
+#   & "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe" -m venv .venv
+#   .venv\Scripts\Activate.ps1                       (Windows PowerShell)
+#   python -m pip install --upgrade pip
+#   # (GPU 사용 시) CUDA 빌드 torch 먼저 설치 - 아래 "AI 모델 학습" 절 참고
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+#   pip install -r requirements.txt
+#   python -m ipykernel install --user --name KAMP --display-name "KAMP"
+#
+# 버전 표기 원칙: "최소 버전(>=)"만 지정. 정확한 재현이 필요하면 같은 폴더의
+#   requirements-lock.txt (pip freeze 결과, 2026-09-10 시점) 를 사용하세요.
+#   현재 확인된 조합: numpy 2.4.6 / pandas 3.0.5 / scikit-learn 1.9.0 /
+#   torch 2.6.0+cu124 / pytorch-lightning 2.6.6 / pytorch-forecasting 1.8.0
+# ===========================================================
+
+# ---- 데이터 처리 / EDA ----
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.8
+plotly>=5.20
+seaborn>=0.13
+scikit-learn>=1.4
+
+# ---- 노트북 실행 환경 ----
+jupyter>=1.0
+ipykernel>=6.29
+nbformat>=5.9
+
+# ---- AI 모델 학습 (N-HiTS, 03_nhits_model.ipynb) ----
+# 위 EDA 패키지들(pandas>=2.2, numpy>=1.26)과 같은 가상환경에서 설치·import·
+# 학습 준비까지 충돌 없이 동작함을 확인 (Python 3.11.9, 2026-09-10).
+#
+# GPU(예: NVIDIA RTX 4070 Ti)로 학습하려면 CUDA 빌드 torch를 먼저 설치하세요.
+# 기본 PyPI의 Windows용 torch 휠은 CPU 전용인 경우가 있어, CUDA 빌드는
+# PyTorch 공식 인덱스에서 받습니다:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+# (사내/기관 네트워크에서 download.pytorch.org 가 막혀 있으면 이 줄만 생략 → CPU로 동작)
+# 설치 후 확인: python -c "import torch; print(torch.cuda.is_available())"  # True 여야 함
+#
+# pytorch_forecasting >= 1.0 부터 NHiTS가 `lightning.pytorch.LightningModule`을
+# 상속하므로, 노트북에서도 `import pytorch_lightning as pl`이 아니라
+# `import lightning.pytorch as pl` / `from lightning.pytorch.callbacks import EarlyStopping`
+# 로 import 해야 합니다 (03_nhits_model.ipynb에 반영되어 있음).
+torch>=2.5
+pytorch-lightning>=2.4
+pytorch-forecasting>=1.2
+
+# ===========================================================
+# 참고: 가이드북 원본은 torch==1.12.1 / pytorch_lightning==1.7.7 /
+# pytorch_forecasting==0.10.3 처럼 2022년 버전으로 고정되어 있으나, 이 구버전 조합은
+# numpy<1.24, pandas<2.0을 요구해 위 EDA 패키지들과 충돌하고 Python 3.11에서
+# 미리 빌드된 wheel도 없습니다. 가이드북과 똑같은 옛 버전으로 재현하려면 아래처럼
+# 별도의 독립된 가상환경(.venv-model 등)을 만드세요.
+#
+#      torch==1.12.1+cu116 torchvision==0.13.1+cu116   # GPU: --extra-index-url https://download.pytorch.org/whl/cu116
+#      pytorch_lightning==1.7.7
+#      pytorch_forecasting==0.10.3
+#      pytorch-forecasting[mqf2]==0.10.3
+#      cpflows==0.1.2
+#      pandas==1.5.2
+#      numpy==1.23.5
+# ===========================================================
