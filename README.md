@@ -30,7 +30,8 @@ pre-kamp/
 │   ├── 03_nhits_model.ipynb            # N-HiTS(단변량) 잔차 기반 이상탐지, 베이스라인과 비교
 │   ├── 04_nhits_multivariate.ipynb     # N-HiTS(다변량, SetPower를 known covariate로 추가)
 │   ├── 05_ensemble.ipynb               # 베이스라인 × N-HiTS 앙상블 (OR/AND 결합)
-│   └── 06_nhits_stable_training.ipynb  # N-HiTS 학습 안정화 (전체 데이터+LR 스케줄러+검증셋 확대)
+│   ├── 06_nhits_stable_training.ipynb  # N-HiTS 학습 안정화 (전체 데이터+LR 스케줄러+검증셋 확대)
+│   └── 07_holdout_retrain.ipynb        # Train:Val=7:3 홀드아웃 재학습 + 베이스라인/N-HiTS/앙상블 최종 test 평가
 ├── docs/
 │   ├── 도메인_배경지식.md              # 예지보전/용접 공정/모델 개념 배경지식 (계속 업데이트)
 │   └── 도메인_배경지식.pdf             # 위 문서의 PDF 버전
@@ -99,6 +100,13 @@ jupyter notebook
    (무작위 배치 서브샘플링 + 고정 학습률이 원인), 전체 데이터 사용 + 학습률 자동탐색/스케줄러 +
    검증셋 확대로 학습을 안정화합니다. 학습 자체는 훨씬 안정되지만 이상탐지 threshold를
    모델에 맞게 다시 보정해야 한다는 중요한 교훈도 함께 정리되어 있습니다.
+8. `notebooks/07_holdout_retrain.ipynb` — 02~06번에서 test 파일(`WeldingTest_03/04_NG.csv`)을
+   반복 열람하며 규칙/threshold/앙상블 방식을 정한 것을 바로잡기 위해, `Training_Data.csv`를
+   시간순 7:3(train:validation)으로 분리하고 **test 데이터는 노트북 맨 마지막 평가 셀에서
+   단 한 번만** 불러옵니다(코드 상 `TEST_DATA_UNLOCKED` 플래그로 강제). 남아있던 epoch 손실
+   스파이크는 `SpikeGuardCallback`(손실이 튀는 즉시 학습률을 절반으로 감소)과
+   EarlyStopping/ReduceLROnPlateau의 patience 간격 재조정으로 추가 완화했습니다. 베이스라인·
+   N-HiTS·앙상블(OR 기본/AND 참고) 3개 모델을 학습해 마지막에 한 번에 비교 평가합니다.
 
 `docs/도메인_배경지식.md`(및 `.pdf`)에는 위 노트북들을 이해하는 데 필요한 개념 설명(예지보전이란
 무엇인지, N-HiTS 잔차 점수의 계산 방식 등)이 정리되어 있으며, 분석이 진행될 때마다 계속
